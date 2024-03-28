@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    #ports:
+    #  - "80:80"
+    # volumes:
+    #  - /caminho/local:/caminho/no/container
+    #environment:
+    # - CHAVE=VALOR
+    build:
+      context: requirements/nginx/
+      dockerfile: Dockerfile
+    networks:
+      - inception-net
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress
+    build:
+      context: requirements/wordpress/
+      dockerfile: Dockerfile
+    networks:
+      - inception-net
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    build:
+      context: requirements/mariadb/
+      dockerfile: Dockerfile
+    networks:
+      - inception-net
+
+networks:
+  inception-net:
+    name: ceater-network
+    driver: bridge
