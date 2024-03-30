@@ -1,13 +1,15 @@
-# Use an existing image as base
-FROM	debian:bullseye
-
-VOLUME [ "/app-vol" ]
+# Stage 1: Build (Contains build tools)
+FROM debian:bullseye AS builder
 
 WORKDIR /app
 
-COPY ./tools/index.sh /app/
+COPY --from=0 ./tools/index.sh /app/ 0755
 
-RUN chmod 755 ./index.sh
+# Stage 2: Runtime (Only includes necessary files)
+FROM nginx:latest
 
-# Run command after container initialization
-CMD ["./index.sh"]
+VOLUME [ "/app-vol" ]
+
+COPY --from=builder /app/index.sh /app/ 0755
+
+CMD ["/app/index.sh"]
