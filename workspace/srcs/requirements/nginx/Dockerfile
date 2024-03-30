@@ -1,10 +1,13 @@
-# Stage 1: Build (Contains build tools)
-FROM debian:bullseye AS builder
+# Use an existing image as base
+FROM    debian:bullseye
 
-VOLUME [ "/data" ]
+VOLUME ./volume /app-vol
 
 WORKDIR /app
 
-COPY --from=0 /app/index.sh /app/ 0755
+COPY ./tools/index.sh /app/
 
-CMD ["/app/index.sh"]
+RUN chmod 755 ./index.sh
+
+# Run command after container initialization
+CMD ["./index.sh"]
