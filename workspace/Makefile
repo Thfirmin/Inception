@@ -58,7 +58,7 @@ re: fclean all
 # Docker info rules |===========================================================
 .PHONY: lsi lsc ls
 
-lsi lsc ls: check_sudo
+lsn lsv lsi lsc ls: check_sudo
 
 lsi:
 	@printf "/------------------|${TXT_YELLOW} DOCKER IMAGES ${TXT_NULL}|------------------\\ \n"
