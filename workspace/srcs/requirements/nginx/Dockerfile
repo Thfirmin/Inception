@@ -3,11 +3,15 @@ FROM debian:bullseye AS builder
 
 WORKDIR /app
 
-COPY ./tools/index.sh /app/ 0755
+COPY ./tools/index.sh /app/
+
+RUN chmod 755 ./index.sh
 
 # Stage 2: Runtime (Only includes necessary files)
 FROM nginx:latest
 
-COPY --from=builder /app/index.sh /app/ 0755
+VOLUME [ "/app-vol" ]
+
+COPY --from=builder /app/index.sh /app/
 
 CMD ["/app/index.sh"]
