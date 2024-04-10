@@ -1,13 +1,21 @@
 # Use an existing image as base
-FROM    debian:bullseye
+FROM	debian:bullseye
 
-VOLUME ./volume /app-vol
-
+# Define starter directory
 WORKDIR /app
 
-COPY ./tools/index.sh /app/
+# Copy file to container
+COPY tools/index.sh .
 
-RUN chmod 755 ./index.sh
+# Set defaulr shell
+SHELL ["/bin/bash","-c"]
 
-# Run command after container initialization
-CMD ["./index.sh"]
+# Run commands before container initialization
+RUN chmod 755 index.sh
+
+# Set default executable
+ENTRYPOINT ["./index.sh"]
+
+# Set entrypoint args
+CMD ["nginx"]
+

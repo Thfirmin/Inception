@@ -23,8 +23,6 @@ check_sudo:
 # Default make routine |========================================================
 .PHONY: all clean break fclean re
 
-all clean break fclean re: check_sudo
-
 .DEFAULT_GOAL := all
 
 all: up
@@ -60,9 +58,7 @@ re: fclean all
 
 
 # Docker info rules |===========================================================
-.PHONY: lsi lsc ls
-
-lsn lsv lsi lsc ls: check_sudo
+.PHONY: lsi lsa lsc lsn lsv ls logn logwp logm logs
 
 lsi:
 	@printf "/------------------|${TXT_YELLOW} DOCKER IMAGES ${TXT_NULL}|------------------\\ \n"
@@ -86,20 +82,34 @@ lsv:
 
 ls: lsi lsc lsn lsv
 
+logn:
+	@printf "${TXT_YELLOW}--------------------------------------------------\\ ${TXT_NULL}\n"
+	@docker logs nginx | awk '{ printf "${TXT_YELLOW}%-13s|${TXT_NULL} %s\n", "nginx", $$LN ; }'
+	@printf "${TXT_YELLOW}--------------------------------------------------/${TXT_NULL}\n"
+
+logwp:
+	@printf "${TXT_GREEN}--------------------------------------------------\\ ${TXT_NULL}\n"
+	@docker logs wordpress | awk '{ printf "${TXT_GREEN}%-13s|${TXT_NULL} %s\n", "wordpress", $$LN ; }'
+	@printf "${TXT_GREEN}--------------------------------------------------/${TXT_NULL}\n"
+
+logm:
+	@printf "${TXT_CYAN}--------------------------------------------------\\ ${TXT_NULL}\n"
+	@docker logs mariadb | awk '{ printf "${TXT_CYAN}%-13s|${TXT_NULL} %s\n", "mariadb", $$LN ; }'
+	@printf "${TXT_CYAN}--------------------------------------------------/${TXT_NULL}\n"
+	
+logs: logn logwp logm
 
 # General service manager rules |===============================================
 .PHONY: up down build run start stop restart
 
-up down build run start stop restart: check_sudo
-
 up:
 	@printf "[${TXT_BLUE}INFO${TXT_NULL}] Turn up docker...\n"
-	@docker-compose -f ${DOCKER_COMPOSE} up
+	@docker-compose -f ${DOCKER_COMPOSE} up --build -d
 	@printf "[${TXT_GREEN}SUCCESS${TXT_NULL}] Docker was turned up...\n"
 
 down:
 	@printf "[${TXT_BLUE}INFO${TXT_NULL}] Turn down docker...\n"
-	@docker-compose -f ${DOCKER_COMPOSE} down
+	@docker-compose -f ${DOCKER_COMPOSE} down --rmi all --volumes --remove-orphans
 	@printf "[${TXT_GREEN}SUCCESS${TXT_NULL}] Docker was turned down...\n"
 
 build:
@@ -121,6 +131,11 @@ stop:
 	@printf "[${TXT_BLUE}INFO${TXT_NULL}] Stopping containers...\n"
 	@docker-compose -f ${DOCKER_COMPOSE} stop
 	@printf "[${TXT_GREEN}SUCCESS${TXT_NULL}] Containers was stopped...\n"
+
+pause:
+	@printf "[${TXT_BLUE}INFO${TXT_NULL}] Pausing containers...\n"
+	@docker-compose -f ${DOCKER_COMPOSE} pause
+	@printf "[${TXT_GREEN}SUCCESS${TXT_NULL}] Containers was pauseded...\n"
 
 restart:
 	@printf "[${TXT_BLUE}INFO${TXT_NULL}] Restarting containers...\n"
