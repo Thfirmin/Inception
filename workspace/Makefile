@@ -13,12 +13,17 @@ TXT_WHITE = \033[38m
 TXT_NULL = \033[0m
 
 # Check sudo permission |=======================================================
+.PHONY: check_sudo test
+
 check_sudo:
 	@if [ $$(id -u) -ne 0 ]; then \
 		printf "[${TXT_RED}ERROR${TXT_NULL}] Root needed to execute this Makefile.\n" >&2; \
 		exit 1; \
 	fi
 
+test: fclean
+	docker build -t testing test/
+	docker run -it -p 8000:80 -p 4430:443 testing
 
 # Default make routine |========================================================
 .PHONY: all clean break fclean re
