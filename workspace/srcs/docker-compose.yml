@@ -4,37 +4,77 @@ services:
   nginx:
     image: nginx
     container_name: nginx
+    restart: unless-stopped
+    env_file:
+      - .env
     ports:
-      - "8080:80"
-    # volumes:
-    #  - /caminho/local:/caminho/no/container
-    #environment:
-    # - CHAVE=VALOR
+      - "80:80"
     build:
       context: requirements/nginx/
       dockerfile: Dockerfile
+    depends_on:
+      wordpress:
+        condition: service_started
+    volumes:
+      - wordpress:/var/www/wp
     networks:
       - inception-net
 
   wordpress:
     image: wordpress
     container_name: wordpress
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
     build:
       context: requirements/wordpress/
       dockerfile: Dockerfile
+    depends_on:
+      mariadb:
+        condition: service_started
+    volumes:
+      - wordpress:/var/www/wp
     networks:
       - inception-net
 
   mariadb:
     image: mariadb
     container_name: mariadb
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
     build:
       context: requirements/mariadb/
       dockerfile: Dockerfile
+    volumes:
+      - database:${DB_VOLUME_PATH}
     networks:
       - inception-net
+
 
 networks:
   inception-net:
     name: ceater-network
     driver: bridge
+
+
+volumes:
+  database:
+    name: database
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/${INTRA_LOGIN}/data/database
+
+  wordpress:
+    name: wordpress
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/${INTRA_LOGIN}/data/wordpress

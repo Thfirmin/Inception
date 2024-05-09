@@ -1,6 +1,8 @@
 # Variables |===================================================================
 DOCKER_COMPOSE = srcs/docker-compose.yml
 
+VOLUME_DIR = ${HOME}/data
+
 TXT_BLACK = \033[30m
 TXT_RED = \033[31m
 TXT_GREEN = \033[32m
@@ -46,6 +48,7 @@ ifneq ($(shell docker volume ls -q 2>/dev/null),)
 	@docker volume rm $$(docker volume ls -q)
 	@printf "[${TXT_GREEN}SUCCESS${TXT_NULL}] Volumes has been break...\n"
 endif
+	@rm -rf ${VOLUME_DIR}
 ifneq ($(shell docker network ls --filter type=custom -q 2>/dev/null),)
 	@printf "[${TXT_YELLOW}WARNING${TXT_NULL}] Breaking networks...\n"
 	@docker network rm $$(docker network ls --filter type=custom -q)
@@ -61,6 +64,9 @@ endif
 
 re: fclean all
 
+${VOLUME_DIR}:
+	mkdir -p ${VOLUME_DIR}/database
+	mkdir -p ${VOLUME_DIR}/wordpress
 
 # Docker info rules |===========================================================
 .PHONY: lsi lsa lsc lsn lsv ls logn logwp logm logs
@@ -107,7 +113,7 @@ logs: logn logwp logm
 # General service manager rules |===============================================
 .PHONY: up down build run start stop restart
 
-up:
+up: ${VOLUME_DIR}
 	@printf "[${TXT_BLUE}INFO${TXT_NULL}] Turn up docker...\n"
 	@docker-compose -f ${DOCKER_COMPOSE} up --build -d
 	@printf "[${TXT_GREEN}SUCCESS${TXT_NULL}] Docker was turned up...\n"
@@ -115,9 +121,10 @@ up:
 down:
 	@printf "[${TXT_BLUE}INFO${TXT_NULL}] Turn down docker...\n"
 	@docker-compose -f ${DOCKER_COMPOSE} down --rmi all --volumes --remove-orphans
+	@rm -rf ${VOLUME_DIR}
 	@printf "[${TXT_GREEN}SUCCESS${TXT_NULL}] Docker was turned down...\n"
 
-build:
+build: ${VOLUME_DIR}
 	@printf "[${TXT_BLUE}INFO${TXT_NULL}] Building images...\n"
 	@docker-compose -f ${DOCKER_COMPOSE} up --no-start
 	@printf "[${TXT_GREEN}SUCCESS${TXT_NULL}] Containers has been build...\n"

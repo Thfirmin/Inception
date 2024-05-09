@@ -5,17 +5,21 @@ FROM	debian:bullseye
 WORKDIR /app
 
 # Copy file to container
-COPY tools/index.sh .
+COPY tools/index.sh	.
+COPY conf/config.cnf	/etc/mysql/mariadb.conf.d/50-server.cnf
 
 # Set defaulr shell
 SHELL ["/bin/bash","-c"]
 
 # Run commands before container initialization
-RUN chmod 755 ./index.sh
+RUN apt update && apt install -y --no-install-recommends mariadb-server && apt clean; \
+	mariadb-install-db --user=mysql --basedir=/usr --datadir=/database;
+
+EXPOSE 3306
 
 # Set default executable
-ENTRYPOINT ["./index.sh"]
+ENTRYPOINT ["/bin/bash"]
 
 # Set entrypoint args
-CMD ["mariadb"]
+CMD ["index.sh"]
 

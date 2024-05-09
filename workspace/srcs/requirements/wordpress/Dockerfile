@@ -5,17 +5,21 @@ FROM	debian:bullseye
 WORKDIR /app
 
 # Copy file to container
-COPY tools/index.sh .
+COPY tools/ .
+COPY conf/ .
 
 # Set defaulr shell
 SHELL ["/bin/bash","-c"]
 
 # Run commands before container initialization
-RUN chmod 755 ./index.sh
+RUN apt update && apt install -y php-fpm php-mysql; \
+	chmod 755 ./index.sh
+
+EXPOSE 9000
 
 # Set default executable
 ENTRYPOINT ["./index.sh"]
 
 # Set entrypoint args
-CMD ["wp"]
+#CMD ["wp"]
 
