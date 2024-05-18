@@ -1,28 +1,19 @@
-# Use an existing image as base
 FROM	debian:bullseye
 
-# Define starter directory
-#WORKDIR /app
+RUN	apt-get update && apt-get install -y nginx openssl
 
-# Copy file to container
-#COPY tools/index.sh .
 COPY	./conf/nginx.conf /etc/nginx/nginx.conf
 COPY	./conf/default.conf /etc/nginx/conf.d/default.conf
 
-# Set defaulr shell
-SHELL ["/bin/bash","-c"]
+COPY	./tools/nginx-cert.sh .
 
-# Run commands before container initialization
-RUN apt update && apt install -y nginx; \
-	chown -R www-data:www-data /var/www/*; \
-	chmod -R 777 /var/www/*
+RUN	chown -R www-data:www-data /var/www/*
+RUN	chmod -R 777 /var/www/*
 
-#RUN chmod 755 index.sh
+RUN	chmod +x ./nginx-cert.sh
 
-EXPOSE 80
+RUN	./nginx-cert.sh
 
-# Set default executable
-ENTRYPOINT ["nginx"]
+EXPOSE	443
 
-# Set entrypoint args
-CMD ["-g","daemon off;"]
+CMD	["nginx", "-g", "daemon off;"]

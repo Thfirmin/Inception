@@ -1,25 +1,18 @@
-# Use an existing image as base
-FROM	debian:bullseye
+FROM debian:bullseye
 
-# Define starter directory
-WORKDIR /app
+#ENV WP_DOMAIN=${WP_DOMAIN}
 
-# Copy file to container
-COPY tools/ .
-COPY conf/ .
+RUN apt update -y \
+&& apt upgrade -y \
+&& apt install -y php-fpm php-mysql wget mariadb-client
 
-# Set defaulr shell
-SHELL ["/bin/bash","-c"]
+RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -O /tmp/wp-cli.phar
+RUN mv /tmp/wp-cli.phar /usr/local/bin/wp
+RUN chmod +x /usr/local/bin/wp
 
-# Run commands before container initialization
-RUN apt update && apt install -y php-fpm php-mysql; \
-	chmod 755 ./index.sh
+COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d/
+COPY ./tools/wp-install.sh /usr/local/bin
+#RUN	mkdir -p /var/www/html/${WP_DOMAIN}
+#COPY	./tools/wp-config.php /var/www/html/${WP_DOMAIN}/wp-config.php
 
-EXPOSE 9000
-
-# Set default executable
-ENTRYPOINT ["./index.sh"]
-
-# Set entrypoint args
-#CMD ["wp"]
-
+ENTRYPOINT ["sh", "/usr/local/bin/wp-install.sh"]

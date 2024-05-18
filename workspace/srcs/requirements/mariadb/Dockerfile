@@ -1,25 +1,11 @@
-# Use an existing image as base
-FROM	debian:bullseye
+FROM debian:bullseye
 
-# Define starter directory
-WORKDIR /app
+RUN apt update \
+&& apt install -y mariadb-server
 
-# Copy file to container
-COPY tools/index.sh	.
-COPY conf/config.cnf	/etc/mysql/mariadb.conf.d/50-server.cnf
+RUN mariadb-install-db --user=mysql --basedir=/usr --datadir=/database
 
-# Set defaulr shell
-SHELL ["/bin/bash","-c"]
+COPY conf/50-server.cnf    /etc/mysql/mariadb.conf.d/50-server.cnf
+COPY ./tools/create-db.sh /bin
 
-# Run commands before container initialization
-RUN apt update && apt install -y --no-install-recommends mariadb-server && apt clean; \
-	mariadb-install-db --user=mysql --basedir=/usr --datadir=/database;
-
-EXPOSE 3306
-
-# Set default executable
-ENTRYPOINT ["/bin/bash"]
-
-# Set entrypoint args
-CMD ["index.sh"]
-
+ENTRYPOINT ["sh", "/bin/create-db.sh"]
