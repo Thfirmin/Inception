@@ -1,25 +1,26 @@
-# Use an existing image as base
-FROM	debian:bullseye
+FROM alpine:3.18
 
-# Define starter directory
-WORKDIR /app
+ARG DB_NAME \
+    DB_USER \
+    DB_PASS
 
-# Copy file to container
-COPY tools/index.sh	.
-COPY conf/config.cnf	/etc/mysql/mariadb.conf.d/50-server.cnf
+RUN apk update && apk add --no-cache mariadb mariadb-client
 
-# Set defaulr shell
-SHELL ["/bin/bash","-c"]
+RUN mkdir /var/run/mysqld; \
+    chmod 777 /var/run/mysqld; \
+    { echo '[mysqld]'; \
+      echo 'skip-host-cache'; \
+      echo 'skip-name-resolve'; \
+      echo 'bind-address=0.0.0.0'; \
+    } | tee  /etc/my.cnf.d/docker.cnf; \
+    sed -i "s|skip-networking|skip-networking=0|g" \
+      /etc/my.cnf.d/mariadb-server.cnf
 
-# Run commands before container initialization
-RUN apt update && apt install -y --no-install-recommends mariadb-server && apt clean; \
-	mariadb-install-db --user=mysql --basedir=/usr --datadir=/database;
+RUN mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
 EXPOSE 3306
 
-# Set default executable
-ENTRYPOINT ["/bin/bash"]
-
-# Set entrypoint args
-CMD ["index.sh"]
-
+COPY requirements/mariadb/conf/create_db.sh .
+RUN sh create_db.sh && rm create_db.sh
+USER mysql
+CMD ["/usr/bin/mysqld", "--skip-log-error"]
