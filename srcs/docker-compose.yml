@@ -6,6 +6,7 @@ services:
       context: .
       dockerfile: requirements/nginx/Dockerfile
     container_name: nginx
+    image: nginx
     depends_on:
       - wordpress
     ports:
@@ -28,6 +29,7 @@ services:
         DB_PASS: ${DB_PASS}
         DB_ROOT: ${DB_ROOT}
     container_name: mariadb
+    image: mariadb
     ports:
       - "3306:3306"
     networks:
@@ -54,6 +56,9 @@ services:
         WP_USERPASS: ${WP_USERPASS}
         WP_HOST: ${WP_HOST}
     container_name: wordpress
+    image: wordpress
+    ports:
+      - "9000:9000"
     depends_on:
       - mariadb
     networks:
@@ -67,6 +72,7 @@ services:
       context: .
       dockerfile: requirements/bonus/redis/Dockerfile
     container_name: redis
+    image: redis
     depends_on:
       - wordpress
     ports:
@@ -83,6 +89,7 @@ services:
         FTP_USR: ${FTP_USR}
         FTP_PWD: ${FTP_PWD}
     container_name: vsftpd
+    image: vsftpd
     depends_on:
       - wordpress
     ports:
@@ -98,6 +105,7 @@ services:
       context: .
       dockerfile: requirements/bonus/adminer/Dockerfile
     container_name: adminer
+    image: adminer
     depends_on:
       - mariadb
     ports:
@@ -111,12 +119,14 @@ services:
       context: .
       dockerfile: requirements/bonus/website/Dockerfile
     container_name: website
+    image: website
     ports:
       - "80:80"
     restart: always
 
   portainer:
     image: portainer/portainer-ce:2.11.1
+    container_name: portainer
     ports:
       - "9443:9443"
     volumes:
@@ -126,12 +136,14 @@ services:
 
 volumes:
   wp-volume:
+    name: wp-volume
     driver_opts:
       o: bind
       type: none
       device: /home/${USER}/data/wordpress
 
   db-volume:
+    name: db-volume
     driver_opts:
       o: bind
       type: none
@@ -141,4 +153,5 @@ volumes:
   
 networks:
     inception:
+        name: inception
         driver: bridge

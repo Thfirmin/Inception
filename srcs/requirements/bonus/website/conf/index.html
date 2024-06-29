@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elon Musk Fun Page</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #282c34;
+            color: #61dafb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+        }
+
+        .title {
+            font-size: 3em;
+            margin-bottom: 20px;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            margin-bottom: 40px;
+            animation: fadeIn 3s ease-in-out;
+        }
+
+        .elon {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            border-radius: 50%;
+            overflow: hidden;
+            animation: float 5s ease-in-out infinite;
+        }
+
+        .elon img {
+            width: 100%;
+            height: auto;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .message {
+            font-size: 1.2em;
+            animation: fadeIn 4s ease-in-out;
+        }
+
+        .animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://i.imgur.com/6hTjI0S.png') repeat;
+            background-size: contain;
+            animation: rotate 60s linear infinite;
+            opacity: 0.2;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="animation"></div>
+        <h1 class="title">Elon Musk Fun Page</h1>
+        <p class="subtitle">Just a guy with a dream... and a few rockets!</p>
+        <div class="elon">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ed/Elon_Musk_Royal_Society.jpg" alt="Elon Musk">
+        </div>
+        <p class="message">Why did Elon Musk go to space? Because he needed more space for his memes!</p>
+    </div>
+</body>
+</html>

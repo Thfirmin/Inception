@@ -44,7 +44,7 @@ ifneq ($(shell docker volume ls -q 2>/dev/null),)
 	docker volume rm $$(docker volume ls -q)
 	@printf "[${TXT_GREEN}SUCCESS${TXT_NULL}] Volumes has been break...\n"
 endif
-	@rm -rf ${VOLUME_DIR}
+	sudo rm -rf ${VOLUME_DIR}
 ifneq ($(shell docker network ls --filter type=custom -q 2>/dev/null),)
 	@printf "[${TXT_YELLOW}WARNING${TXT_NULL}] Breaking networks...\n"
 	docker network rm $$(docker network ls --filter type=custom -q)
@@ -61,7 +61,7 @@ endif
 re: fclean all
 
 ${VOLUME_DIR}:
-	mkdir -p ${VOLUME_DIR}/database
+	mkdir -p ${VOLUME_DIR}/mariadb
 	mkdir -p ${VOLUME_DIR}/wordpress
 
 # Docker info rules |===========================================================
@@ -96,6 +96,9 @@ log:
 
 # General service manager rules |===============================================
 .PHONY: up down build run start stop restart
+
+plug:
+	docker exec -it "$(ARG)" /bin/sh
 
 up: ${VOLUME_DIR}
 	@printf "[${TXT_BLUE}INFO${TXT_NULL}] Turn up docker...\n"
